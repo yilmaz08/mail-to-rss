@@ -5,27 +5,19 @@ import email.header
 def parse_email(res, msg, email_address):
     title = f"Mail for {email_address}"
     description = ""
-    
+
     for response in msg:
         if isinstance(response, tuple):
             msg = email.message_from_bytes(response[1])
             subject, encoding = email.header.decode_header(msg.get("Subject"))[0]
-            if isinstance(subject, bytes):
+            if isinstance(subject, bytes) and encoding is not None:
                 title = subject.decode(encoding=encoding)
 
             From, encoding = email.header.decode_header(msg.get("From"))[0]
-            if isinstance(From, bytes):
-                From = From.decode(encoding)
-            
-            date_result = ""
-            date, encoding = email.header.decode_header(msg.get("Date"))[0]
-            if isinstance(date, bytes):
-                date_str = date.decode(encoding)
+            if isinstance(From, bytes) and encoding is not None:
+                From = From.decode(encoding=encoding)
 
-            
-
-            description += f"From: {From}\nTo: {email_address}\nDate: {date_result}"
-
+            description += f"From: {From}\nTo: {email_address}\n"
     return title, description
 
 def get_emails(email: str, password: str, imap_server: str):
